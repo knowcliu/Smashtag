@@ -33,8 +33,24 @@ class TweetTableViewCell: UITableViewCell {
                 for _ in tweet.media {
                     tweetTextLabel.text! +=  " 📷"
                 }
+                
+                // FIXME: Make sure you do not “break” the feature that currently exists in Smashtag whereby it shows Tweets using the preferred body font style (and thus the text in the Tweets can be made larger or smaller by the user in Settings).
+                let attrTweet = NSMutableAttributedString(string: tweetTextLabel.text!)
+                for hashtag in tweet.hashtags {
+                    attrTweet.setAttributes([NSForegroundColorAttributeName: UIColor.purpleColor()], range: hashtag.nsrange)
+                }
+
+                for url in tweet.urls {
+                    attrTweet.setAttributes([NSForegroundColorAttributeName: UIColor.blueColor()], range: url.nsrange)
+                }
+                
+                for mention in tweet.userMentions {
+                    attrTweet.setAttributes([NSForegroundColorAttributeName: UIColor.grayColor()], range: mention.nsrange)
+                }
+                
+                tweetTextLabel.attributedText = attrTweet
             }
-            
+                        
             tweetScreenNameLabel?.text = "\(tweet.user)"
             
             if let profileImageURL = tweet.user.profileImageURL{

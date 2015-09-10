@@ -11,6 +11,7 @@ import UIKit
 class TweetTableViewController: UITableViewController, UITextFieldDelegate {
 
     var tweets = [[Tweet]]()
+    
     var searchText: String? = "#stanford" {
         didSet {
             lastSuccessfulRequest = nil
@@ -158,5 +159,16 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
         // Pass the selected object to the new view controller.
     }
     */
-
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let mtvc = segue.destinationViewController as? MentionsTableViewController {
+            if let identifier = segue.identifier {
+                if let tweetCell = sender as? TweetTableViewCell {
+                    if (identifier == "Mentions") {
+                        mtvc.tweet = tweetCell.tweet
+                    }
+                }
+            }
+        }
+    }
 }

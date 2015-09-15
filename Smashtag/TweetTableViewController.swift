@@ -91,6 +91,14 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
         return true
     }
     
+    @IBAction func unwindFromMentionsTableViewController(sender: UIStoryboardSegue) {
+        if sender.identifier == "UnwindToTweetTable" {
+            if let mtvc = sender.sourceViewController as? MentionsTableViewController {
+                searchText = mtvc.selectedText
+            }
+        }
+    }
+    
     // MARK: - UITableViewDataSource
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {

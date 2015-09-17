@@ -92,7 +92,7 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
     }
     
     @IBAction func unwindFromMentionsTableViewController(sender: UIStoryboardSegue) {
-        if sender.identifier == "UnwindToTweetTable" {
+        if sender.identifier == Storyboard.UnwindReuseIdentifier {
             if let mtvc = sender.sourceViewController as? MentionsTableViewController {
                 searchText = mtvc.selectedText
             }
@@ -109,10 +109,6 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // Return the number of rows in the section.
         return tweets[section].count
-    }
-
-    private struct Storyboard {
-        static let CellReuseIdentifier = "Tweet"
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -172,7 +168,7 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
         if let mtvc = segue.destinationViewController as? MentionsTableViewController {
             if let identifier = segue.identifier {
                 if let tweetCell = sender as? TweetTableViewCell {
-                    if (identifier == "Mentions") {
+                    if (identifier == Storyboard.MentionsReuseIdentifier) {
                         mtvc.tweet = tweetCell.tweet
                     }
                 }

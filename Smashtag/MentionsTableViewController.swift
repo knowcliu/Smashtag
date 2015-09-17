@@ -10,7 +10,7 @@ import UIKit
 
 class MentionsTableViewController: UITableViewController {
 
-    var tweet: Tweet?
+    var tweet: Tweet!
     
     enum mentionsSections: Printable {
         case Hashtags
@@ -32,28 +32,36 @@ class MentionsTableViewController: UITableViewController {
         }
     }
     
-    // the list of text to display per mention type
-    var sections = [(mentionsSections, [String])]()
+    var groups = [mentionsSections]()
     
-    var selectedText : String?
+    var selectedText: String?
     
     func loadSections() {
-        if (sections.count == 0) {
-            if (tweet?.media.count > 0) {
-                sections.append(
-                    (mentionsSections.Media, tweet!.media.map( {"\($0.url)" } ) ) )
+        if (groups.count == 0) {
+            if (tweet.media.count > 0) {
+                groups.append(mentionsSections.Media)
             }
-            if (tweet?.hashtags.count > 0) {
-                sections.append(
-                    (mentionsSections.Hashtags, tweet!.hashtags.map( {"\($0.keyword)"} ) ) )
+            if (tweet.hashtags.count > 0) {
+                groups.append(mentionsSections.Hashtags)
             }
-            if (tweet?.userMentions.count > 0) {
-                sections.append(
-                    (mentionsSections.Users, tweet!.userMentions.map( {"\($0.keyword)" } ) ) )
+            if (tweet.userMentions.count > 0) {
+                groups.append(mentionsSections.Users)
             }
-            if (tweet?.urls.count > 0) {
-                sections.append(
-                    (mentionsSections.URLS, tweet!.urls.map({"\($0.keyword)"} ) ) )
+            if (tweet.urls.count > 0) {
+                groups.append(mentionsSections.URLS)
+            }
+        }
+    }
+    
+    private func fetchImage(imageURL: NSURL, cell: ImageTableViewCell) {
+        let qos = Int(QOS_CLASS_USER_INITIATED.value)
+        dispatch_async(dispatch_get_global_queue(qos, 0)) { () -> Void in
+            let imageData = NSData(contentsOfURL: imageURL)
+            dispatch_async(dispatch_get_main_queue()) {
+                if imageData != nil {
+                    cell.imageView?.image = UIImage(data: imageData!, scale: 1)
+                    self.tableView.reloadData()
+                }
             }
         }
     }
@@ -72,62 +80,82 @@ class MentionsTableViewController: UITableViewController {
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // Return the number of sections.
-        return sections.count
+        return groups.count
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // Return the number of rows in the section.
-        return sections[section].1.count
+        switch groups[section] {
+        case .Hashtags:
+            return tweet.hashtags.count ?? 0
+        case .Media:
+            return tweet.media.count ?? 0
+        case .URLS:
+            return tweet.urls.count ?? 0
+        case .Users:
+            return tweet.userMentions.count ?? 0
+        }
     }
     
-    
-    private struct Storyboard {
-        static let TextCellReuseIdentifier = "TextCell"
-        static let ImageCellReuseIdentifier = "ImageCell"
-        static let UnwindReuseIdentifier = "UnwindToTweetTable"
-    }
-
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 
         // Configure the cell...
-        var (sectionType, rows) = sections[indexPath.section]
-        switch sectionType {
+        switch groups[indexPath.section] {
         case .Media:
-            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.ImageCellReuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
-            if let url = NSURL(string: rows[indexPath.row]) {
-                if let data = NSData(contentsOfURL: url) {
-                    cell.contentMode = UIViewContentMode.ScaleAspectFit
-                    cell.imageView?.image = UIImage(data: data)
-                    // cell.imageView?.sizeThatFits(size: )
-                }
+            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.ImageCellReuseIdentifier, forIndexPath: indexPath) as! ImageTableViewCell
+            if cell.imageView?.image == nil {
+                fetchImage(tweet.media[indexPath.row].url, cell: cell)
             }
             return cell
-        case .Hashtags, .Users, .URLS:
+        case .Users:
             let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.TextCellReuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
-            cell.textLabel?.text = rows[indexPath.row]
+            cell.textLabel?.text = tweet.userMentions[indexPath.row].keyword
+            return cell
+        case .Hashtags:
+            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.TextCellReuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
+            cell.textLabel?.text = tweet.hashtags[indexPath.row].keyword
+            return cell
+        case .URLS:
+            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.TextCellReuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
+            cell.textLabel?.text = tweet.urls[indexPath.row].keyword
             return cell
         }
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String {
-        return sections[section].0.description
+        return groups[section].description
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var (sectionType, rows) = sections[indexPath.section]
-        switch sectionType {
+        switch groups[indexPath.section] {
         case .URLS:
-            if let URL = NSURL(string: rows[indexPath.row]) {
+            if let URL = NSURL(string: tweet.urls[indexPath.row].keyword) {
                 UIApplication.sharedApplication().openURL(URL)
             }
-        case .Hashtags, .Users:
-            self.selectedText = rows[indexPath.row]
+        case .Hashtags:
+            self.selectedText = tweet.hashtags[indexPath.row].keyword
+            self.performSegueWithIdentifier(Storyboard.UnwindReuseIdentifier, sender: self)
+        case .Users:
+            self.selectedText = tweet.userMentions[indexPath.row].keyword
             self.performSegueWithIdentifier(Storyboard.UnwindReuseIdentifier, sender: self)
         case .Media:
+            // TODO: segue to new view which will allow gestures on the image
             break
         }
     }
+    
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        // Configure the cell...
+        switch groups[indexPath.section] {
+        case .Media:
+            var aspectRatio = tweet.media[indexPath.row].aspectRatio
+            return view.frame.width / CGFloat(aspectRatio)
 
+        case .Hashtags, .URLS, .Users:
+            return UITableViewAutomaticDimension
+        }
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {

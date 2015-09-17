@@ -35,6 +35,7 @@ class TweetTableViewCell: UITableViewCell {
                 }
                 
                 // FIXME: Make sure you do not “break” the feature that currently exists in Smashtag whereby it shows Tweets using the preferred body font style (and thus the text in the Tweets can be made larger or smaller by the user in Settings).
+                // BUG: When the Accessibility settings change, the app does not automatically set all the font sizes to the correct thing. Very odd! Some tweets have the correct setting, but others do not.
                 let attrTweet = NSMutableAttributedString(string: tweetTextLabel.text!)
                 for hashtag in tweet.hashtags {
                     attrTweet.setAttributes([NSForegroundColorAttributeName: UIColor.purpleColor()], range: hashtag.nsrange)
@@ -54,9 +55,13 @@ class TweetTableViewCell: UITableViewCell {
             tweetScreenNameLabel?.text = "\(tweet.user)"
             
             if let profileImageURL = tweet.user.profileImageURL{
-                // FIXME: this blocks the main thread
-                if let imageData = NSData(contentsOfURL: profileImageURL) {
-                    tweetProfileImageView?.image = UIImage(data: imageData)
+                let qos = Int(QOS_CLASS_USER_INITIATED.value)
+                dispatch_async(dispatch_get_global_queue(qos, 0)) { () -> Void in
+                    if let imageData = NSData(contentsOfURL: profileImageURL) {
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.tweetProfileImageView?.image = UIImage(data: imageData)
+                        }
+                    }
                 }
             }
         }

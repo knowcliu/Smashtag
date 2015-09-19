@@ -17,4 +17,5 @@ public struct Storyboard {
     static let ImageCellReuseIdentifier = "ImageCell"
     static let UnwindReuseIdentifier = "UnwindToTweetTable"
     static let MentionsReuseIdentifier = "Mentions"
+    static let SearchTermReuseIdentifier = "SearchTerm"
 }

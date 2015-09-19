@@ -16,11 +16,16 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
         didSet {
             lastSuccessfulRequest = nil
             searchTextField.text = searchText
+            // add the search to NSUserData to store the top 100 searches
+            if searchText != nil {
+                SearchHistory.sharedHistory.addSearchTerm(searchText!)
+            }
             tweets.removeAll()
             tableView.reloadData()
             refresh()
         }
     }
+        
     // MARK: ViewController Lifecycle
     
     override func viewDidLoad() {

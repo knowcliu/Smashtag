@@ -10,7 +10,7 @@ import Foundation
 
 // container to hold data about a Twitter user
 
-public struct User: Printable
+public struct User: CustomStringConvertible
 {
     public let screenName: String
     public let name: String
@@ -18,7 +18,7 @@ public struct User: Printable
     public let verified: Bool
     public let id: String?
     
-    public var description: String { var v = verified ? " ✅" : ""; return "@\(screenName) (\(name))\(v)" }
+    public var description: String { let v = verified ? " ✅" : ""; return "@\(screenName) (\(name))\(v)" }
 
     // MARK: - Private Implementation
 
@@ -29,7 +29,11 @@ public struct User: Printable
                 screenName = screenNameFromData
                 id = data?.valueForKeyPath(TwitterKey.ID) as? String
                 verified = data?.valueForKeyPath(TwitterKey.Verified)?.boolValue ?? false
-                if let urlString = data?.valueForKeyPath(TwitterKey.ProfileImageURL) as? String {
+                if var urlString = data?.valueForKeyPath(TwitterKey.ProfileImageURL) as? String {
+                    // use HTTPS:
+                    if (urlString.rangeOfString("https") == nil) {
+                        urlString.insert("s", atIndex: urlString.startIndex.advancedBy((4)))
+                    }
                     profileImageURL = NSURL(string: urlString)
                 } else {
                     profileImageURL = nil

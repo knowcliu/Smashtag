@@ -12,7 +12,7 @@ class MentionsTableViewController: UITableViewController {
 
     var tweet: Tweet!
     
-    enum mentionsSections: Printable {
+    enum mentionsSections: CustomStringConvertible {
         case Hashtags
         case Users
         case Media
@@ -54,7 +54,7 @@ class MentionsTableViewController: UITableViewController {
     }
     
     private func fetchImage(imageURL: NSURL, cell: ImageTableViewCell) {
-        let qos = Int(QOS_CLASS_USER_INITIATED.value)
+        let qos = Int(QOS_CLASS_USER_INITIATED.rawValue)
         dispatch_async(dispatch_get_global_queue(qos, 0)) { () -> Void in
             let imageData = NSData(contentsOfURL: imageURL)
             dispatch_async(dispatch_get_main_queue()) {
@@ -108,15 +108,15 @@ class MentionsTableViewController: UITableViewController {
             }
             return cell
         case .Users:
-            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.TextCellReuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
+            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.TextCellReuseIdentifier, forIndexPath: indexPath) 
             cell.textLabel?.text = tweet.userMentions[indexPath.row].keyword
             return cell
         case .Hashtags:
-            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.TextCellReuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
+            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.TextCellReuseIdentifier, forIndexPath: indexPath) 
             cell.textLabel?.text = tweet.hashtags[indexPath.row].keyword
             return cell
         case .URLS:
-            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.TextCellReuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
+            let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.TextCellReuseIdentifier, forIndexPath: indexPath) 
             cell.textLabel?.text = tweet.urls[indexPath.row].keyword
             return cell
         }
@@ -148,7 +148,7 @@ class MentionsTableViewController: UITableViewController {
         // Configure the cell...
         switch groups[indexPath.section] {
         case .Media:
-            var aspectRatio = tweet.media[indexPath.row].aspectRatio
+            let aspectRatio = tweet.media[indexPath.row].aspectRatio
             return view.frame.width / CGFloat(aspectRatio)
 
         case .Hashtags, .URLS, .Users:

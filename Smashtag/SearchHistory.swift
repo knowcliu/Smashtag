@@ -34,6 +34,6 @@ class SearchHistory {
         }
         
         last100Searches.append(searchTerm)
-        println("Added search to history: \(searchTerm)")
+        debugPrint("Added search to history: \(searchTerm)")
     }
 }

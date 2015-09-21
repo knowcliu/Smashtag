@@ -51,17 +51,17 @@ class HistoryTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.SearchTermReuseIdentifier, forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier(Storyboard.SearchTermReuseIdentifier, forIndexPath: indexPath) 
 
         // Configure the cell...
         // display the most recent searches first
-        let searchTerm = SearchHistory.sharedHistory.last100Searches.reverse()[indexPath.row]
+        let searchTerm = Array(SearchHistory.sharedHistory.last100Searches.reverse())[indexPath.row]
         cell.textLabel!.text = searchTerm
         return cell
     }
 
     override func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
-        self.selectedText = SearchHistory.sharedHistory.last100Searches.reverse()[indexPath.row]
+        self.selectedText = Array(SearchHistory.sharedHistory.last100Searches.reverse())[indexPath.row]
         return indexPath
     }
     /*

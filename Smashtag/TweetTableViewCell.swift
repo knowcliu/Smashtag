@@ -55,7 +55,7 @@ class TweetTableViewCell: UITableViewCell {
             tweetScreenNameLabel?.font = UIFont.preferredFontForTextStyle(UIFontTextStyleHeadline)
             
             if let profileImageURL = tweet.user.profileImageURL{
-                let qos = Int(QOS_CLASS_USER_INITIATED.value)
+                let qos = Int(QOS_CLASS_USER_INITIATED.rawValue)
                 dispatch_async(dispatch_get_global_queue(qos, 0)) { () -> Void in
                     if let imageData = NSData(contentsOfURL: profileImageURL) {
                         dispatch_async(dispatch_get_main_queue()) {

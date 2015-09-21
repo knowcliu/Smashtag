@@ -8,9 +8,6 @@
 
 import Foundation
 
-
-// TODO: Add the struct for ReuseIdentifiers for the entire project here
-
 public struct Storyboard {
     static let CellReuseIdentifier = "Tweet"
     static let TextCellReuseIdentifier = "TextCell"
@@ -18,4 +15,5 @@ public struct Storyboard {
     static let UnwindReuseIdentifier = "UnwindToTweetTable"
     static let MentionsReuseIdentifier = "Mentions"
     static let SearchTermReuseIdentifier = "SearchTerm"
+    static let TweetSearchReuseIdentifier = "TweetSearch"
 }

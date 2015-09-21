@@ -15,7 +15,7 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
     var searchText: String? = "#stanford" {
         didSet {
             lastSuccessfulRequest = nil
-            searchTextField.text = searchText
+            searchTextField?.text = searchText
             // add the search to NSUserData to store the top 100 searches
             if searchText != nil {
                 SearchHistory.sharedHistory.addSearchTerm(searchText!)
@@ -25,7 +25,7 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
             refresh()
         }
     }
-        
+    
     // MARK: ViewController Lifecycle
     
     override func viewDidLoad() {
@@ -40,6 +40,28 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
+    
+    /*
+    DEMO: handling the NSNotification for Accessibility Fonts
+    Maybe you want the UI to change if the font is too big and the buttons will overflow. This isn't needed if you let the text fields use the TextStyles and not the System or Custom styles: (eg use Body, Headline, Subhead etc instead of "System 17")
+    
+    let center = NSNotificationCenter.defaultCenter()
+
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+    
+        center.addObserverForName(UIContentSizeCategoryDidChangeNotification,
+            object: UIApplication.sharedApplication(),
+            queue: NSOperationQueue.mainQueue()) {
+    notification in
+    let c = notification.userInfo?[UIContentSizeCategoryNewValueKey]
+        }
+    }
+
+    override func viewDidDisappear(animated: Bool) {
+        center.removeObserver(UIContentSizeCategoryDidChangeNotification)
+    }
+*/
     
     var lastSuccessfulRequest: TwitterRequest?
     var nextRequestAttempt: TwitterRequest? {

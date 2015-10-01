@@ -34,6 +34,8 @@ class TweetTableViewCell: UITableViewCell {
                     tweetTextLabel.text! +=  " 📷"
                 }
                 
+                // TODO: make AttrString honor sys pref fonts. Adding it in the init doesn't seem to work:
+                // let attrTweet = NSMutableAttributedString(string: tweetTextLabel.text!, attributes: [NSFontAttributeName: UIFont.preferredFontForTextStyle(UIFontTextStyleBody)])
                 let attrTweet = NSMutableAttributedString(string: tweetTextLabel.text!)
                 for hashtag in tweet.hashtags {
                     attrTweet.setAttributes([NSForegroundColorAttributeName: UIColor.purpleColor()], range: hashtag.nsrange)
